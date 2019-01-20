@@ -1,0 +1,5 @@
+{
+    "require": {
+        "yourivw/leclient": "1.1.*"
+    }
+}
