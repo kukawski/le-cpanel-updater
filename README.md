@@ -5,7 +5,7 @@ This script was created for automating the process of renewal of the Let's Encry
 ## Requirements
 
 The script requires curl and openssl extensions.
-This script also requires a logger that implements following methods: `error($msg)`, `warn($msg)`, `info($msg)`, `debug($msg)`.
+This script also requires a logger that implements the [PSR-3 LoggerInterface](https://www.php-fig.org/psr/psr-3/).
 
 ## Usage
 
@@ -21,11 +21,13 @@ if (!isset($_GET['cron'])) {
 
 require 'le-cpanel-updater.php';
 
-class NoopLogger {
-    public function error ($msg) {}
-    public function warn ($msg) {}
-    public function info ($msg) {}
-    public function debug ($msg) {}
+use Psr\Log\LoggerInterface;
+
+class NoopLogger implements LoggerInterface {
+    public function error ($msg, $context = []) {}
+    public function warn ($msg, $context = []) {}
+    public function info ($msg, $context = []) {}
+    public function debug ($msg, $context = []) {}
 }
 
 $le = new LEUpdater(new LEUpdaterConfig([

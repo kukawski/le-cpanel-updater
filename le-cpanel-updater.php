@@ -7,6 +7,7 @@ use LEClient\LEAccount;
 use LEClient\LEOrder;
 use LEClient\LEAuthorization;
 use LEClient\LEClient;
+use Psr\Log\LoggerInterface;
 
 class LEUpdaterConfig {
     protected $leAccountMail;
