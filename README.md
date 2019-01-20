@@ -15,6 +15,10 @@ Next, include the `le-cpanel-updater.php` file.
 
 ```php
 <?php
+if (!isset($_GET['cron'])) {
+    die();
+}
+
 require 'le-cpanel-updater.php';
 
 class NoopLogger {
@@ -42,3 +46,12 @@ if ($le->checkIfLECertUpdateNeeded($TWO_DAYS)) {
 }
 ?>
 ```
+
+Last step is to configure cron. Example command
+
+```
+wget -O /dev/null -o /dev/null https://example.org/acme.php?cron=1
+```
+
+Note: at the moment the script requires to be called using a HTTP request, not through CLI.
+This limitation will be removed asap.
