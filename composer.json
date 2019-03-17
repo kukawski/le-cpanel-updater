@@ -1,6 +1,6 @@
 {
     "require": {
-        "yourivw/leclient": "1.1.*",
+        "yourivw/leclient": "^1.1",
         "psr/log": "^1.0"
     }
 }
