@@ -35,7 +35,11 @@ class LEUpdater {
 
     public function __construct(LEUpdaterConfig $config) {
         $this->config = $config;
-        $this->logger = $config->logger;
+        $this->logger = $config->logger ?? new class {
+            public function debug($msg) { /* noop */ }
+            public function error($msg) { /* noop */ }
+            public function info($msg) { /* noop */ }
+        };
 
         if (!function_exists('openssl_x509_parse')) {
             throw new Exception('openssl_x509_parse function is required for this script to work');
