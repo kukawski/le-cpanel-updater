@@ -31,7 +31,7 @@ class NoopLogger implements LoggerInterface {
 }
 
 $le = new LEUpdater(new LEUpdaterConfig([
-    'leAccountMail' => 'mail@example.org',
+    'leAccountMail' => ['mail@example.org'], // it should be an array, cause LEClient expects it like this
     'domains' => [ 'example.org', 'www.example.org', 'mail.example.org' ],
     'certDir' => __DIR__ . '/.keys',
     'cPanelHost' => 'https://INSERT_YOUR_CPANEL_URL:2083',
