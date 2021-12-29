@@ -113,18 +113,27 @@ class LEUpdater {
             }
 
             // check again, although now everything should be fine
-            if ($order->allAuthorizationsValid()) {
-                if (!$order->isFinalized()) {
-                    $order->finalizeOrder();
-                }
-
-                if ($order->isFinalized()) {
-                    $order->getCertificate();
-                }
+            if (!$order->allAuthorizationsValid()) {
+                $this->logger->debug("Some authorizations are not valid, which is unexpected");
+                return FALSE;
             }
+
+            if (!$order->isFinalized() AND !$order->finalizeOrder()) {
+                $this->logger->debug("Failed finalizing order");
+                return FALSE;
+            }
+
+            if (!$order->getCertificate()) {
+                $this->logger->debug("Failed getting the certificate");
+                return FALSE;
+            }
+
+            return TRUE;
         } catch (Exception $err) {
             $this->logger->error('Error occured while requesting certificate');
             $this->logger->error($err);
+
+            return FALSE;
         } finally {
             // log all cached messages. Should help debugging what went wrong
             $log = ob_get_clean();
