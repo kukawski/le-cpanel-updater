@@ -48,6 +48,12 @@ class LEUpdater {
         }
     }
 
+    /**
+     * Checks if stored certificate expires within seconds
+     *
+     * @param int number of seconds
+     * @return boolean true if certificate expires within the requested seconds, false otherwise
+     */
     public function certificateExpiresWithinSeconds(int $seconds) {
         $update_needed = FALSE;
 
@@ -74,6 +80,11 @@ class LEUpdater {
         return $update_needed;
     }
 
+    /**
+     * Requests new certificate from Let's Encrypt backend
+     *
+     * @return boolean true if certificate successfully downloaded, false otherwise
+     */
     public function issueLECert() {
         // LEClient prints logs to stdout. Let's cache them
         ob_start();
@@ -141,6 +152,11 @@ class LEUpdater {
         }
     }
 
+    /**
+     * Installs the stored certificate in cPanel using either token or basic auth
+     *
+     * @return boolean true if installation successful, false otherwise
+     */
     public function installLECert() {
         $this->logger->info('Starting installation of new certificate');
 
