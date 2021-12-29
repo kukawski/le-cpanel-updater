@@ -36,12 +36,7 @@ class LEUpdater {
 
     public function __construct(LEUpdaterConfig $config) {
         $this->config = $config;
-        $this->logger = $config->logger ?? new class {
-            public function debug($msg) { /* noop */ }
-            public function error($msg) { /* noop */ }
-            public function info($msg) { /* noop */ }
-            public function warn($msg) { /* noop */ }
-        };
+        $this->logger = $config->logger;
 
         if (!function_exists('openssl_x509_parse')) {
             throw new Exception('openssl_x509_parse function is required for this script to work');
@@ -60,19 +55,19 @@ class LEUpdater {
         $path = $this->config->certDir . '/certificate.crt';
 
         if (!file_exists($path)) {
-            $this->logger->debug('Certificate file does not exist. Assume script\'s first run');
+            $this->logger?->debug('Certificate file does not exist. Assume script\'s first run');
             $update_needed = TRUE;
         } else {
-            $this->logger->debug('Old certificate file exists');
+            $this->logger?->debug('Old certificate file exists');
             $cert_info = openssl_x509_parse(file_get_contents($path));
 
             if (!isset($cert_info['validTo_time_t'])) {
-                $this->logger->debug('validTo_time_t not set');
+                $this->logger?->debug('validTo_time_t not set');
                 $update_needed = TRUE;
             }
 
             if (!$update_needed AND ($cert_info['validTo_time_t'] - time() <= $seconds)) {
-                $this->logger->debug('Old certificate is about to expire soon: ' . date('Y-m-d H:i:s', $cert_info['validTo_time_t']));
+                $this->logger?->debug('Old certificate is about to expire soon: ' . date('Y-m-d H:i:s', $cert_info['validTo_time_t']));
                 $update_needed = TRUE;
             }
         }
@@ -86,9 +81,6 @@ class LEUpdater {
      * @return boolean true if certificate successfully downloaded, false otherwise
      */
     public function issueLECert() {
-        // LEClient prints logs to stdout. Let's cache them
-        ob_start();
-
         try {
             $mail = $this->config->leAccountMail;
             $domains = $this->config->domains;
@@ -100,7 +92,8 @@ class LEUpdater {
             $client = new LEClient(
                 is_array($mail) ? $mail : array($mail),
                 LEClient::LE_PRODUCTION,
-                LECLient::LOG_STATUS, $path
+                $this->logger ?? LEClient::LOG_OFF,
+                $path
             );
 
             $order = $client->getOrCreateOrder($basename, $domains);
@@ -125,30 +118,26 @@ class LEUpdater {
 
             // check again, although now everything should be fine
             if (!$order->allAuthorizationsValid()) {
-                $this->logger->debug("Some authorizations are not valid, which is unexpected");
+                $this->logger?->debug("Some authorizations are not valid, which is unexpected");
                 return FALSE;
             }
 
             if (!$order->isFinalized() AND !$order->finalizeOrder()) {
-                $this->logger->debug("Failed finalizing order");
+                $this->logger?->debug("Failed finalizing order");
                 return FALSE;
             }
 
             if (!$order->getCertificate()) {
-                $this->logger->debug("Failed getting the certificate");
+                $this->logger?->debug("Failed getting the certificate");
                 return FALSE;
             }
 
             return TRUE;
         } catch (Exception $err) {
-            $this->logger->error('Error occured while requesting certificate');
-            $this->logger->error($err);
+            $this->logger?->error('Error occured while requesting certificate');
+            $this->logger?->error($err);
 
             return FALSE;
-        } finally {
-            // log all cached messages. Should help debugging what went wrong
-            $log = ob_get_clean();
-            $this->logger->debug($log);
         }
     }
 
@@ -172,7 +161,7 @@ class LEUpdater {
             OR !file_exists($path . '/private.pem')
             OR !file_exists($path . '/fullchain.crt')
         ) {
-            $this->logger->debug('Missing certificate file, private key or full chain file');
+            $this->logger?->debug('Missing certificate file, private key or full chain file');
             return FALSE;
         }
 
@@ -211,7 +200,7 @@ class LEUpdater {
         $curl_response = curl_exec($ch);
         curl_close($ch);
 
-        $this->logger->debug($curl_response);
+        $this->logger?->debug($curl_response);
 
         // TODO: check if installation did really work
 
