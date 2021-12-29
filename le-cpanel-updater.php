@@ -48,7 +48,7 @@ class LEUpdater {
         }
     }
 
-    public function checkIfLECertUpdateNeeded(int $maxSecondsToExpiration) {
+    public function certificateExpiresWithinSeconds(int $seconds) {
         $update_needed = FALSE;
 
         $path = $this->config->certDir . '/certificate.crt';
@@ -65,7 +65,7 @@ class LEUpdater {
                 $update_needed = TRUE;
             }
 
-            if (!$update_needed AND ($cert_info['validTo_time_t'] - time() <= $maxSecondsToExpiration)) {
+            if (!$update_needed AND ($cert_info['validTo_time_t'] - time() <= $seconds)) {
                 $this->logger->debug('Old certificate is about to expire soon: ' . date('Y-m-d H:i:s', $cert_info['validTo_time_t']));
                 $update_needed = TRUE;
             }
