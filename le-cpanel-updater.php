@@ -40,6 +40,7 @@ class LEUpdater {
             public function debug($msg) { /* noop */ }
             public function error($msg) { /* noop */ }
             public function info($msg) { /* noop */ }
+            public function warn($msg) { /* noop */ }
         };
 
         if (!function_exists('openssl_x509_parse')) {
