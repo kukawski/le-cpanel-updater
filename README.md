@@ -23,28 +23,47 @@ require 'le-cpanel-updater.php';
 
 use Psr\Log\LoggerInterface;
 
-class NoopLogger implements LoggerInterface {
-    public function error ($msg, $context = []) {}
-    public function warn ($msg, $context = []) {}
-    public function info ($msg, $context = []) {}
-    public function debug ($msg, $context = []) {}
+class EchoLogger implements LoggerInterface {
+    public function error ($msg, $context = []) {
+        echo $msg . PHP_EOL;
+    }
+    public function warn ($msg, $context = []) {
+        echo $msg . PHP_EOL;
+    }
+    public function info ($msg, $context = []) {
+        echo $msg . PHP_EOL;
+    }
+    public function debug ($msg, $context = []) {
+        echo $msg . PHP_EOL;
+    }
 }
 
+$logger = new EchoLogger();
+
 $le = new LEUpdater(new LEUpdaterConfig([
-    'leAccountMail' => ['mail@example.org'], // it should be an array, cause LEClient expects it like this
+    'leAccountMail' => 'mail@example.org',
     'domains' => [ 'example.org', 'www.example.org', 'mail.example.org' ],
     'certDir' => __DIR__ . '/.keys',
     'cPanelHost' => 'https://INSERT_YOUR_CPANEL_URL:2083',
     'cPanelUsername' => 'INSERT_YOUR_CPANEL_USERNAME',
     'cPanelPassword' => 'INSERT_YOUR_CPANEL_PASSWORD',
-    'logger' => new NoopLogger()
+    'logger' => $logger
 ]));
 
 $TWO_DAYS = 172800; // 2 days in seconds
 
-if ($le->checkIfLECertUpdateNeeded($TWO_DAYS)) {
-    $le->issueLECert();
-    $le->installLECert();
+if ($le->certificateExpiresWithinSeconds($TWO_DAYS)) {
+    if ($le->issueLECert()) {
+        if ($le->installLECert()) {
+            $logger->info("Certificate installed");
+        } else {
+            $logger->info("Certificate installation failed");
+        }
+    } else {
+        $logger->info("Getting new certificate failed");
+    }
+} else {
+    $logger->info("Certificate valid longer than checked time, skipping update");
 }
 ?>
 ```
