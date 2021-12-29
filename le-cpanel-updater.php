@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
 use LEClient\LEConnector;
 use LEClient\LEFunctions;
