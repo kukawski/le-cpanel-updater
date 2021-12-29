@@ -86,7 +86,11 @@ class LEUpdater {
 
             $path = $this->config->certDir;
 
-            $client = new LEClient($mail, LEClient::LE_PRODUCTION, LECLient::LOG_STATUS, $path);
+            $client = new LEClient(
+                is_array($mail) ? $mail : array($mail),
+                LEClient::LE_PRODUCTION,
+                LECLient::LOG_STATUS, $path
+            );
 
             $order = $client->getOrCreateOrder($basename, $domains);
 
