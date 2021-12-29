@@ -120,11 +120,11 @@ class LEUpdater {
         } catch (Exception $err) {
             $this->logger->error('Error occured while requesting certificate');
             $this->logger->error($err);
+        } finally {
+            // log all cached messages. Should help debugging what went wrong
+            $log = ob_get_clean();
+            $this->logger->debug($log);
         }
-
-        // log all cached messages. Should help debugging what went wrong
-        $log = ob_get_clean();
-        $this->logger->debug($log);
     }
 
     public function installLECert() {
