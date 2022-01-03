@@ -48,7 +48,7 @@ $le = new LEUpdater(new LEUpdaterConfig([
     'certDir' => __DIR__ . '/.keys',
     'cPanelHost' => 'https://INSERT_YOUR_CPANEL_URL:2083',
     'cPanelUsername' => 'INSERT_YOUR_CPANEL_USERNAME',
-    'cPanelPassword' => 'INSERT_YOUR_CPANEL_PASSWORD',
+    'cPanelPassword' => 'INSERT_YOUR_CPANEL_TOKEN',
     'logger' => $logger
 ]));
 
