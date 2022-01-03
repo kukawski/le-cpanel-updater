@@ -145,7 +145,7 @@ class LEUpdater {
         $this->logger->info('Starting installation of new certificate');
 
         $request_uri = $this->config->cPanelHost . '/execute/SSL/install_ssl';
-        $basicAuth = $this->config->useBasicAuth;
+        $useBasicAuth = $this->config->useBasicAuth;
         $username = $this->config->cPanelUsername;
         $password = $this->config->cPanelPassword;
 
@@ -180,7 +180,7 @@ class LEUpdater {
 
         // make call to cPanel API
         $ch = curl_init($request_uri);
-        if (basicAuth) {
+        if ($useBasicAuth) {
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
         } else {
