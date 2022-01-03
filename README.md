@@ -15,6 +15,8 @@ Next, include the `le-cpanel-updater.php` file.
 
 ```php
 <?php
+// execute only if query params have cron key, just a pseudo-protection
+// replace with own measures if needed
 if (!isset($_GET['cron'])) {
     die();
 }
@@ -53,14 +55,13 @@ $le = new LEUpdater(new LEUpdaterConfig([
 $TWO_DAYS = 172800; // 2 days in seconds
 
 if ($le->certificateExpiresWithinSeconds($TWO_DAYS)) {
-    if ($le->issueLECert()) {
-        if ($le->installLECert()) {
-            $logger->info("Certificate installed");
-        } else {
-            $logger->info("Certificate installation failed");
-        }
-    } else {
-        $logger->info("Getting new certificate failed");
+    try {
+        $le->issueLECert();
+        $le->installCert();
+        $logger->info("Successfully updated the certificate");
+    } catch (Exception $err) {
+        $logger->error("Certificate update failed");
+        $logger->debug($err);
     }
 } else {
     $logger->info("Certificate valid longer than checked time, skipping update");

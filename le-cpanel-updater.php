@@ -77,8 +77,6 @@ class LEUpdater {
 
     /**
      * Requests new certificate from Let's Encrypt backend
-     *
-     * @return boolean true if certificate successfully downloaded, false otherwise
      */
     public function issueLECert() {
         try {
@@ -119,32 +117,29 @@ class LEUpdater {
             // check again, although now everything should be fine
             if (!$order->allAuthorizationsValid()) {
                 $this->logger?->debug("Some authorizations are not valid, which is unexpected");
-                return FALSE;
+                throw new Exception("Unexpected invalid authorizations");
             }
 
             if (!$order->isFinalized() AND !$order->finalizeOrder()) {
                 $this->logger?->debug("Failed finalizing order");
-                return FALSE;
+                throw new Exception("Failed finalizing order");
             }
 
             if (!$order->getCertificate()) {
                 $this->logger?->debug("Failed getting the certificate");
-                return FALSE;
+                throw new Exception("Failed getting the certificate");
             }
 
-            return TRUE;
         } catch (Exception $err) {
             $this->logger?->error('Error occured while requesting certificate');
             $this->logger?->error($err);
 
-            return FALSE;
+            throw $err;
         }
     }
 
     /**
      * Installs the stored certificate in cPanel using either token or basic auth
-     *
-     * @return boolean true if installation successful, false otherwise
      */
     public function installLECert() {
         $this->logger->info('Starting installation of new certificate');
@@ -162,7 +157,7 @@ class LEUpdater {
             OR !file_exists($path . '/fullchain.crt')
         ) {
             $this->logger?->debug('Missing certificate file, private key or full chain file');
-            return FALSE;
+            throw new Exception("Missing certificate, private key or full chain files");
         }
 
         $fullchain = file_get_contents($path . '/fullchain.crt');
@@ -203,8 +198,6 @@ class LEUpdater {
         $this->logger?->debug($curl_response);
 
         // TODO: check if installation did really work
-
-        return TRUE;
     }
 }
 ?>
