@@ -78,6 +78,6 @@ wget -O /dev/null -o /dev/null https://example.org/acme.php?cron=1
 Note: at the moment the script requires to be called using a HTTP request, not through CLI.
 This limitation will be removed asap.
 
-Warning: I strongly suggest storing the cPanel credentials and the keys folder outside of the server's DocumentRoot.
+Warning: I strongly suggest blocking access to the keys folder using .htaccess.
 
 
