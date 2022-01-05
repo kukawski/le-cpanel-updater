@@ -41,6 +41,8 @@ class LEUpdater {
         if (!function_exists('openssl_x509_parse')) {
             throw new Exception('openssl_x509_parse function is required for this script to work');
         }
+
+        mkdir($config->certDir, 0777, TRUE);
     }
 
     /**
