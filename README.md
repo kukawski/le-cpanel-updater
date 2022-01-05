@@ -57,7 +57,7 @@ $TWO_DAYS = 172800; // 2 days in seconds
 if ($le->certificateExpiresWithinSeconds($TWO_DAYS)) {
     try {
         $le->issueLECert();
-        $le->installCert();
+        $le->installLECert();
         $logger->info("Successfully updated the certificate");
     } catch (Exception $err) {
         $logger->error("Certificate update failed");
